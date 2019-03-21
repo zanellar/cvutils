@@ -1,2 +1,2 @@
-# cvutils
-some basic script for images and video
+# Scripts for Image/Videos Processing (cvutils)
+some basic script to elaborate images and video
