@@ -133,7 +133,7 @@ class MarkerDetector(object):
     def detectMarkers(self, image, markers_metric_size=-1.0, markers_map=None):
         aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
         corners, ids, rejectedImgPoints = aruco.detectMarkers(image, aruco_dict)
-        print(ids)
+        # print(ids)
         final_markers = []
         if markers_metric_size < 0 and markers_map is None:
             return final_markers
