@@ -9,7 +9,7 @@ def draw2DReferenceFrame(frame, image, size=-1, thick=2, tipLength=0.3, force_co
     p, M, _, _ = tf.affines.decompose(frame)
 
     center = np.array([p[0], p[1]], dtype=int)
-    ax = np.array([M[0, 0], M[1, 0]], dtype=float) * size  # BUG
+    ax = np.array([M[0, 0], M[1, 0]], dtype=float) * size
     ay = np.array([M[0, 1], M[1, 1]], dtype=float) * size
     ax = ax.astype(int)
     ay = ay.astype(int)

@@ -58,6 +58,16 @@ class ImageAreaOfInterest(object):
         relative_image_area = self._getRelativeImageArea()
         drawPolygon(self.image, relative_image_area)
 
+    def replace(self, patch, show_it=False):
+        mask = self._buildMask(self.image)
+        mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+
+        self.image[mask != 0] = patch[mask != 0]
+
+        if show_it:
+            cv2.namedWindow("masked", cv2.WINDOW_NORMAL)
+            cv2.imshow("masked", self.image)
+
     def getMaskedImage(self, show_it=False):
         ''' Returns (and eventually shows) the image (Numpy array) with only the area of interest visible and black pixels outside it.'''
         mask = self._buildMask(self.image)
@@ -65,7 +75,6 @@ class ImageAreaOfInterest(object):
         if show_it:
             cv2.namedWindow("masked", cv2.WINDOW_NORMAL)
             cv2.imshow("masked", masked)
-
         return masked
 
     def getCroppedArea(self, show_it=False):  # TODO work in progress
