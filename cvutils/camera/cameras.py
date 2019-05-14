@@ -25,15 +25,15 @@ class Camera(object):
 
         camera_calibration = json.loads(open(self.configuration_file).read())
 
+        self.fixed_frame = np.array(list(camera_calibration["fixed_frame_name"]))
         self.position_vector = np.array(list(camera_calibration["position_vector"]))
-        self.orientation_quaternion = np.array(list(camera_calibration["orientation_quaternion"]))
+        self.rotation_matrix = np.array(list(camera_calibration["rotation_matrix"]))
         self.camera_matrix = np.array(list(camera_calibration["camera_matrix"]))
         self.distortion_coefficients = np.array(list(camera_calibration["dist_coeffs"]))
         self.image_size = np.array(list(camera_calibration["image_size"]))
 
         self.camera_matrix_inv = np.linalg.inv(self.camera_matrix)
-        self.orientation_matrix = None  # np.array([]) TODO https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Conversion_to_and_from_the_matrix_representation
-
+ 
         self.width = int(self.image_size[0])
         self.height = int(self.image_size[1])
         self.fx = self.camera_matrix[0][0]
@@ -57,7 +57,7 @@ class Camera(object):
         point = np.array([px, py, pz])
         return point
 
-    def get3DPointPlane(self, u, v, plane_coefficients, fixed_frame=False):
+    def get3DPointPlane(self, u, v, plane_coefficients, fixed_frame=False, reference_frame=None):
         # from image point [pixels] to cartasian ray [meters]
         image_point = np.array([
             u,
@@ -81,8 +81,12 @@ class Camera(object):
         plane_point = np.array([x, y, z])
 
         # point with respect to the fixed reference frame
-        # if fixed_frame:
-        #     plane_point = np.matmul(self.orientation_matrix, plane_point) - self.position_vector
+        if fixed_frame:
+            plane_point = np.matmul(self.rotation_matrix, plane_point) - self.position_vector
+
+        # point with respect to a user-defined frame
+        if reference_frame is not None:
+            plane_point = np.matmul(reference_frame, plane_point)
 
         return plane_point.reshape(3)
 
