@@ -2,8 +2,6 @@
 """Cameras management."""
 import cv2
 import numpy as np
-from cv_bridge import CvBridge, CvBridgeError
-import cv_bridge
 
 import os
 import sys
@@ -92,7 +90,6 @@ class Camera(object):
 
 
 class FrameRGBD(object):
-    CV_BRIDGE = CvBridge()
 
     def __init__(self, rgb_image=None, depth_image=None, time=None):
         self.rgb_image = rgb_image
@@ -116,28 +113,6 @@ class FrameRGBD(object):
                     points.append(p)
         return points
 
-    @staticmethod
-    def buildFromMessages(rgb_msg, depth_msg, depth_scale=1000):
-        frame = FrameRGBD()
-        frame.depth_scale = 1000
-        frame.time = rgb_msg.header.stamp
-        try:
-            frame.rgb_image = FrameRGBD.CV_BRIDGE.imgmsg_to_cv2(
-                rgb_msg, "bgr8")
-        except CvBridgeError as e:
-            print(e)
-            return frame
-
-        try:
-            frame.depth_image = FrameRGBD.CV_BRIDGE.imgmsg_to_cv2(
-                depth_msg, "16UC1")
-        except CvBridgeError as e:
-            print(e)
-            return frame
-
-        frame.valid = True
-        return frame
-
 
 # ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
 # ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
@@ -145,7 +120,6 @@ class FrameRGBD(object):
 
 
 class FrameRGB(object):
-    CV_BRIDGE = CvBridge()
 
     def __init__(self, rgb_image=None, time=None):
         self.rgb_image = rgb_image
@@ -157,38 +131,3 @@ class FrameRGB(object):
 
     def isValid(self):
         return self.valid
-
-    @staticmethod
-    def buildFromMessages(rgb_msg):
-        frame = FrameRGB()
-        frame.time = rgb_msg.header.stamp
-        try:
-            frame.rgb_image = FrameRGBD.CV_BRIDGE.imgmsg_to_cv2(
-                rgb_msg, "bgr8")
-        except CvBridgeError as e:
-            try:
-                frame.rgb_image = FrameRGBD.CV_BRIDGE.imgmsg_to_cv2(
-                    rgb_msg, "8UC1")
-            except CvBridgeError as e:
-                print(e)
-                return frame
-
-        frame.valid = True
-        return frame
-
-    @staticmethod
-    def buildFromMessagesCompressed(rgb_msg):
-        frame = FrameRGB()
-        frame.time = rgb_msg.header.stamp
-
-        np_arr = np.fromstring(rgb_msg.data, np.uint8)
-        try:
-            frame.rgb_image = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
-        except:
-            try:
-                frame.rgb_image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-            except:
-                return frame
-
-        frame.valid = True
-        return frame
