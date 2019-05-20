@@ -31,7 +31,7 @@ class Camera(object):
         self.image_size = np.array(list(camera_calibration["image_size"]))
 
         self.camera_matrix_inv = np.linalg.inv(self.camera_matrix)
- 
+
         self.width = int(self.image_size[0])
         self.height = int(self.image_size[1])
         self.fx = self.camera_matrix[0][0]
@@ -56,6 +56,8 @@ class Camera(object):
         return point
 
     def get3DPointPlane(self, u, v, plane_coefficients, fixed_frame=False, reference_frame=None):
+        '''plane_coefficients = [a,b,c,d]
+        plane equation: ax+by+cz+d=0'''
         # from image point [pixels] to cartasian ray [meters]
         image_point = np.array([
             u,
@@ -80,11 +82,19 @@ class Camera(object):
 
         # point with respect to the fixed reference frame
         if fixed_frame:
-            plane_point = np.matmul(self.rotation_matrix, plane_point) - self.position_vector
+            # plane_point = np.matmul(np.linalg.inv(self.rotation_matrix), plane_point - self.position_vector)
+            # plane_point = np.matmul(self.rotation_matrix, plane_point) + self.position_vector
+            plane_point_h = np.concatenate((plane_point, [1]))
+            camera_frame = np.concatenate((self.rotation_matrix, self.position_vector.reshape(3, 1)), axis=1)
+            camera_frame_h = np.concatenate((camera_frame, [[0, 0, 0, 1]]))
+            plane_point_h = np.matmul(camera_frame_h, plane_point_h)
+            plane_point = plane_point_h[:3]
 
         # point with respect to a user-defined frame
         if reference_frame is not None:
-            plane_point = np.matmul(reference_frame, plane_point)
+            plane_point_h = np.concatenate((plane_point, [1]))
+            plane_point_h = np.matmul(reference_frame, plane_point_h)
+            plane_point = plane_point_h[:3]
 
         return plane_point.reshape(3)
 
