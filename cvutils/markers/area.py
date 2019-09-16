@@ -59,6 +59,7 @@ class ImageAreaOfInterest(object):
         drawPolygon(self.image, relative_image_area)
 
     def replace(self, patch, show_it=False):
+        ''' replace a patch on the image area'''
         mask = self._buildMask(self.image)
         mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 

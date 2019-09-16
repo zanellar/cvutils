@@ -39,8 +39,8 @@ class ARMarker(object):
              self.Tvec[[2]]]
         )
         if self.z_up:
-            self.M = self.M*tfeuler.x_rotation(-np.pi / 2.0)
-            self.M = self.M*tfeuler.z_rotation(-np.pi)
+            self.M = self.M * tfeuler.x_rotation(-np.pi / 2.0)
+            self.M = self.M * tfeuler.z_rotation(-np.pi)
 
         self.corners = []
         for p in self.esqns:
@@ -131,9 +131,9 @@ class MarkerDetector(object):
         self.index = 0
 
     def detectMarkers(self, image, markers_metric_size=-1.0, markers_map=None):
-        aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
+        aruco_dict = aruco.Dictionary_get(aruco.DICT_5X5_1000)  # BUG eventually change this according to the type of marker
         corners, ids, rejectedImgPoints = aruco.detectMarkers(image, aruco_dict)
-        # print(ids)
+
         final_markers = []
         if markers_metric_size < 0 and markers_map is None:
             return final_markers
@@ -152,6 +152,7 @@ class MarkerDetector(object):
                                 esquinas = corners[self.index]
                                 esqns = np.array([esquinas])
                                 marker = ids[self.index]
+
                                 break
                             self.index = self.index + 1
                         self.index = 0
@@ -169,6 +170,7 @@ class MarkerDetector(object):
         markers = self.detectMarkers(image,
                                      markers_metric_size,
                                      markers_map)  # Returns an array of arrays (Rotation Vector M, and Traslation Vector p)
+
         markers_map = {}
         for marker in markers:
             markers_map[marker.getID()] = marker

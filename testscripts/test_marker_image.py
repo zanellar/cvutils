@@ -106,7 +106,8 @@ class MarkerHandler(object):
 if __name__ == '__main__':
 
     markers_map = {args.marker_id[0]: args.marker_size[0],
-                   args.marker_id[1]: args.marker_size[1]}
+                   args.marker_id[1]: args.marker_size[1]
+                   }
 
     # ⬢⬢⬢⬢⬢➤ MARKER
     marker = MarkerHandler(camera_params)

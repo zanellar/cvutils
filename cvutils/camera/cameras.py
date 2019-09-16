@@ -55,9 +55,13 @@ class Camera(object):
         point = np.array([px, py, pz])
         return point
 
-    def get3DPointPlane(self, u, v, plane_coefficients, fixed_frame=False, reference_frame=None):
+    def get3DPointPlane(self, u, v, plane_coefficients, fixed_frame=False, reference_frame=None, plane_wrt_world=False):
         '''plane_coefficients = [a,b,c,d]
         plane equation: ax+by+cz+d=0'''
+
+        camera_frame = np.concatenate((self.rotation_matrix, self.position_vector.reshape(3, 1)), axis=1)
+        camera_frame_h = np.concatenate((camera_frame, [[0, 0, 0, 1]]))
+
         # from image point [pixels] to cartasian ray [meters]
         image_point = np.array([
             u,
@@ -69,7 +73,9 @@ class Camera(object):
         ray = ray.reshape(3)
 
         # intersection cartesian ray and target plane
-        # plane_coefficients = frame2plane(frame)
+        if plane_wrt_world:  # TODO this must be tested
+            plane_coefficients = np.matmul(np.matrix.transpose(camera_frame_h), plane_coefficients)
+
         t = -(plane_coefficients[3]) / (
             plane_coefficients[0] * ray[0] +
             plane_coefficients[1] * ray[1] +
@@ -85,8 +91,6 @@ class Camera(object):
             # plane_point = np.matmul(np.linalg.inv(self.rotation_matrix), plane_point - self.position_vector)
             # plane_point = np.matmul(self.rotation_matrix, plane_point) + self.position_vector
             plane_point_h = np.concatenate((plane_point, [1]))
-            camera_frame = np.concatenate((self.rotation_matrix, self.position_vector.reshape(3, 1)), axis=1)
-            camera_frame_h = np.concatenate((camera_frame, [[0, 0, 0, 1]]))
             plane_point_h = np.matmul(camera_frame_h, plane_point_h)
             plane_point = plane_point_h[:3]
 
