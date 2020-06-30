@@ -29,8 +29,8 @@ from cvutils.processing.processingutils import ImageProcessing
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--image_file", required=True, help="Target image file.")
-ap.add_argument("--marker_id", default=[777, 666])
-ap.add_argument("--marker_size", default=[0.01, 0.01])
+ap.add_argument("--marker_id", default=[0])
+ap.add_argument("--marker_size", default=[0.01])
 ap.add_argument("--debug", default=False, type=bool)
 args = ap.parse_args()
 
@@ -105,8 +105,7 @@ class MarkerHandler(object):
 
 if __name__ == '__main__':
 
-    markers_map = {args.marker_id[0]: args.marker_size[0],
-                   args.marker_id[1]: args.marker_size[1]
+    markers_map = {args.marker_id[0]: args.marker_size[0]
                    }
 
     # ⬢⬢⬢⬢⬢➤ MARKER
